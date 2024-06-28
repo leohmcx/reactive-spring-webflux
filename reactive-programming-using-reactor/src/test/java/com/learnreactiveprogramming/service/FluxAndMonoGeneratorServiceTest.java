@@ -20,4 +20,17 @@ class FluxAndMonoGeneratorServiceTest {
                 .expectNext("alex").expectNextCount(2)
                 .verifyComplete();
     }
+
+    @Test
+    void namesFluxMap() {
+        //given
+
+        //when
+        var namesFlux = service.namesFluxMap();
+
+        //then
+        StepVerifier.create(namesFlux)
+                .expectNext("ALEX", "BEN", "CHLOE")
+                .verifyComplete();
+    }
 }
