@@ -19,6 +19,15 @@ public class FluxAndMonoGeneratorService {
         return Flux.fromIterable(List.of("alex", "ben", "chloe")).map(String::toUpperCase).log();
     }
 
+    public Flux<String> namesFluxImmutability() {
+        var namesFlux = Flux.fromIterable(List.of("alex", "ben", "chloe"));
+        // this won't be applied because wasn't applied in the direct function or the operations together in the above
+        // line this show why the reactive streams are immutable.
+        namesFlux.map(String::toUpperCase);
+
+        return namesFlux;
+    }
+
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
 

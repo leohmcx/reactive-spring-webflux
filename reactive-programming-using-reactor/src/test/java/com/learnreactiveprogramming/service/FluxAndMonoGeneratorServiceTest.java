@@ -33,4 +33,17 @@ class FluxAndMonoGeneratorServiceTest {
                 .expectNext("ALEX", "BEN", "CHLOE")
                 .verifyComplete();
     }
+
+    @Test
+    void namesFluxImmutability() {
+        //given
+
+        //when
+        var namesFlux = service.namesFluxImmutability();
+
+        //then - The only way you can see the changes is by chaining the function together or the operators together to get the desired result.
+        StepVerifier.create(namesFlux)
+                .expectNext("alex", "ben", "chloe")
+                .verifyComplete();
+    }
 }
