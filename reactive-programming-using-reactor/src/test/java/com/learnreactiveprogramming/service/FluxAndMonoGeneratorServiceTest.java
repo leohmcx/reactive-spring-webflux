@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
+import java.util.List;
+
 class FluxAndMonoGeneratorServiceTest {
     FluxAndMonoGeneratorService service = new FluxAndMonoGeneratorService();
 
@@ -98,6 +100,32 @@ class FluxAndMonoGeneratorServiceTest {
         //then - The only way you can see the changes is by chaining the function together or the operators together to get the desired result.
         StepVerifier.create(namesFlux)
                 .expectNext("A", "L", "E", "X", "C", "H", "L", "O", "E")
+                .verifyComplete();
+    }
+
+    @Test
+    void namesMonoFlatMapFilter() {
+        //given
+
+        //when
+        var namesFlux = service.namesMonoFlatMapFilter(3);
+
+        //then - The only way you can see the changes is by chaining the function together or the operators together to get the desired result.
+        StepVerifier.create(namesFlux)
+                .expectNext(List.of("A", "L", "E", "X"))
+                .verifyComplete();
+    }
+
+    @Test
+    void namesMonoFlatMapMany() {
+        //given
+
+        //when
+        var namesFlux = service.namesMonoFlatMapMany(3);
+
+        //then - The only way you can see the changes is by chaining the function together or the operators together to get the desired result.
+        StepVerifier.create(namesFlux)
+                .expectNext("A", "L", "E", "X")
                 .verifyComplete();
     }
 }

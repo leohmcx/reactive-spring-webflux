@@ -86,6 +86,29 @@ public class FluxAndMonoGeneratorService {
                 .delayElements(Duration.ofMillis(delay));
     }
 
+    public Mono<List<String>> namesMonoFlatMapFilter(int stringLength) {
+        return Mono.just("alex")
+                .map(String::toUpperCase)
+                .filter(name -> name.length() > stringLength)
+                .flatMap(this::namesMonoFlatMap)
+                .log();
+    }
+
+    private Mono<List<String>> namesMonoFlatMap(String name) {
+        var charArray = name.split("");
+        var charList = List.of(charArray);
+
+        return Mono.just(charList);
+    }
+
+    public Flux<String> namesMonoFlatMapMany(int stringLength) {
+        return Mono.just("alex")
+                .map(String::toUpperCase)
+                .filter(name -> name.length() > stringLength)
+                .flatMapMany(this::splitString)
+                .log();
+    }
+
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
 
