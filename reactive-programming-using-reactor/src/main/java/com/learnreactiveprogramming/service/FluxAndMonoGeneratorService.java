@@ -69,6 +69,23 @@ public class FluxAndMonoGeneratorService {
                 .delayElements(Duration.ofMillis(delay));
     }
 
+    public Flux<String> namesFluxFlatMapConcatMap(int nameFilter) {
+        return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                .map(String::toUpperCase)
+                .filter(name -> name.length() > nameFilter)
+                // A, L, E, X, C, H, L, O, E
+                .concatMap(this::splitStringConcatMap)
+                .log();
+    }
+
+    private Flux<String> splitStringConcatMap(String name) {
+        var charArray = name.split("");
+        var delay = new Random().nextInt(1000);
+
+        return Flux.fromArray(charArray)
+                .delayElements(Duration.ofMillis(delay));
+    }
+
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
 

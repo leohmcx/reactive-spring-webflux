@@ -87,4 +87,17 @@ class FluxAndMonoGeneratorServiceTest {
                 .expectNextCount(9)
                 .verifyComplete();
     }
+
+    @Test
+    void namesFluxFlatMapConcatMap() {
+        //given
+
+        //when
+        var namesFlux = service.namesFluxFlatMapConcatMap(3);
+
+        //then - The only way you can see the changes is by chaining the function together or the operators together to get the desired result.
+        StepVerifier.create(namesFlux)
+                .expectNext("A", "L", "E", "X", "C", "H", "L", "O", "E")
+                .verifyComplete();
+    }
 }
