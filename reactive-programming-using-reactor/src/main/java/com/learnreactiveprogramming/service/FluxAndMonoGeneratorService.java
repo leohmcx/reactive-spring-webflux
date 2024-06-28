@@ -3,7 +3,9 @@ package com.learnreactiveprogramming.service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.Random;
 
 public class FluxAndMonoGeneratorService {
 
@@ -44,10 +46,27 @@ public class FluxAndMonoGeneratorService {
                 .log();
     }
 
-    public Flux<String> splitString(String name) {
+    private Flux<String> splitString(String name) {
         var charArray = name.split("");
 
         return Flux.fromArray(charArray);
+    }
+
+    public Flux<String> namesFluxFlatMapDelay(int nameFilter) {
+        return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                .map(String::toUpperCase)
+                .filter(name -> name.length() > nameFilter)
+                // A, L, E, X, C, H, L, O, E
+                .flatMap(this::splitStringDelay)
+                .log();
+    }
+
+    private Flux<String> splitStringDelay(String name) {
+        var charArray = name.split("");
+        var delay = new Random().nextInt(1000);
+
+        return Flux.fromArray(charArray)
+                .delayElements(Duration.ofMillis(delay));
     }
 
     public static void main(String[] args) {

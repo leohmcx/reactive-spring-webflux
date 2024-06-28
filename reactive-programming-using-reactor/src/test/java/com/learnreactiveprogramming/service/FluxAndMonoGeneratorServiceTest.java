@@ -1,5 +1,7 @@
 package com.learnreactiveprogramming.service;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
@@ -70,6 +72,19 @@ class FluxAndMonoGeneratorServiceTest {
         //then - The only way you can see the changes is by chaining the function together or the operators together to get the desired result.
         StepVerifier.create(namesFlux)
                 .expectNext("A", "L", "E", "X", "C", "H", "L", "O", "E")
+                .verifyComplete();
+    }
+
+    @Test
+    void namesFluxFlatMapDelay() {
+        //given
+
+        //when
+        var namesFlux = service.namesFluxFlatMapDelay(3);
+
+        //then - The only way you can see the changes is by chaining the function together or the operators together to get the desired result.
+        StepVerifier.create(namesFlux)
+                .expectNextCount(9)
                 .verifyComplete();
     }
 }
