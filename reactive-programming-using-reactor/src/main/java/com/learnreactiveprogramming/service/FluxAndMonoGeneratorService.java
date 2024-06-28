@@ -28,6 +28,13 @@ public class FluxAndMonoGeneratorService {
         return namesFlux;
     }
 
+    public Flux<String> namesFluxFilter(int nameFilter) {
+        return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                .map(String::toUpperCase)
+                .filter(name -> name.length() > nameFilter)
+                .log();
+    }
+
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
 

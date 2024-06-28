@@ -46,4 +46,17 @@ class FluxAndMonoGeneratorServiceTest {
                 .expectNext("alex", "ben", "chloe")
                 .verifyComplete();
     }
+
+    @Test
+    void namesFluxFilterStringByLength() {
+        //given
+
+        //when
+        var namesFlux = service.namesFluxFilter(3);
+
+        //then - The only way you can see the changes is by chaining the function together or the operators together to get the desired result.
+        StepVerifier.create(namesFlux)
+                .expectNext("ALEX", "CHLOE")
+                .verifyComplete();
+    }
 }
