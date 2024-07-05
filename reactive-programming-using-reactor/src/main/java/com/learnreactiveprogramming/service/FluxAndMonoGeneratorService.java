@@ -4,7 +4,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static java.lang.Long.parseLong;
@@ -16,24 +15,26 @@ public class FluxAndMonoGeneratorService {
     public static final List<String> NAMES = List.of("alex", "ben", "chloe");
 
     /**
-     * 00:30:38.807 [main] INFO reactor.Mono.Just.2 - | onSubscribe([Synchronous Fuseable] Operators.ScalarSubscription)
-     * 00:30:38.807 [main] INFO reactor.Mono.Just.2 - | request(unbounded)
-     * 00:30:38.807 [main] INFO reactor.Mono.Just.2 - | onNext(alex)
+     * 01:17:23.976 [main] INFO reactor.Flux.Iterable.1 - | onSubscribe([Synchronous Fuseable] FluxIterable.IterableSubscription)
+     * 01:17:23.982 [main] INFO reactor.Flux.Iterable.1 - | request(unbounded)
+     * 01:17:23.983 [main] INFO reactor.Flux.Iterable.1 - | onNext(alex)
+     * Flux Name is: alex
+     * 01:17:24.016 [main] INFO reactor.Flux.Iterable.1 - | onNext(ben)
+     * Flux Name is: ben
+     * 01:17:24.016 [main] INFO reactor.Flux.Iterable.1 - | onNext(chloe)
+     * Flux Name is: chloe
+     * 01:17:24.018 [main] INFO reactor.Flux.Iterable.1 - | onComplete()
      */
     public Flux<String> namesFlux() {
         return Flux.fromIterable(NAMES).log();
     }
 
     /**
-     * 00:30:38.704 [main] INFO reactor.Flux.Iterable.1 - | onSubscribe([Synchronous Fuseable] FluxIterable.IterableSubscription)
-     * 00:30:38.707 [main] INFO reactor.Flux.Iterable.1 - | request(unbounded)
-     * 00:30:38.708 [main] INFO reactor.Flux.Iterable.1 - | onNext(alex)
-     * Flux Name is: alex
-     * 00:30:38.736 [main] INFO reactor.Flux.Iterable.1 - | onNext(ben)
-     * Flux Name is: ben
-     * 00:30:38.736 [main] INFO reactor.Flux.Iterable.1 - | onNext(chloe)
-     * Flux Name is: chloe
-     * 00:30:38.737 [main] INFO reactor.Flux.Iterable.1 - | onComplete()
+     * 01:17:24.169 [main] INFO reactor.Mono.Just.2 - | onSubscribe([Synchronous Fuseable] Operators.ScalarSubscription)
+     * 01:17:24.171 [main] INFO reactor.Mono.Just.2 - | request(unbounded)
+     * 01:17:24.171 [main] INFO reactor.Mono.Just.2 - | onNext(alex)
+     * Mono Name is: alex
+     * 01:17:24.172 [main] INFO reactor.Mono.Just.2 - | onComplete()
      */
     public Mono<String> nameMono()  {
         return Mono.just("alex").log();
@@ -46,6 +47,9 @@ public class FluxAndMonoGeneratorService {
      * 00:30:06.515 [Test worker] INFO reactor.Flux.MapFuseable.1 - | onNext(BEN)
      * 00:30:06.516 [Test worker] INFO reactor.Flux.MapFuseable.1 - | onNext(CHLOE)
      * 00:30:06.517 [Test worker] INFO reactor.Flux.MapFuseable.1 - | onComplete()
+     * ------------------------------------------------------------------------------------------------------------
+     * This pickup the names and iterates for each name in onNext, applying the uppercase in each name.
+     * ------------------------------------------------------------------------------------------------------------
      */
     public Flux<String> namesFluxMap() {
         return Flux.fromIterable(NAMES).map(String::toUpperCase).log();
@@ -58,6 +62,10 @@ public class FluxAndMonoGeneratorService {
      * 00:29:35.995 [Test worker] INFO reactor.Flux.Iterable.1 - | onNext(ben)
      * 00:29:35.995 [Test worker] INFO reactor.Flux.Iterable.1 - | onNext(chloe)
      * 00:29:35.998 [Test worker] INFO reactor.Flux.Iterable.1 - | onComplete()
+     * ------------------------------------------------------------------------------------------------------------
+     * This pickup the names and iterates for each name in onNext, the uppercase happens after and don't apply the
+     * changes since the flux is immutable.
+     * ------------------------------------------------------------------------------------------------------------
      */
     public Flux<String> namesFluxImmutability() {
         var namesFlux = Flux.fromIterable(NAMES).log();
@@ -74,6 +82,9 @@ public class FluxAndMonoGeneratorService {
      * 00:28:18.864 [Test worker] INFO reactor.Flux.FilterFuseable.1 - | onNext(ALEX)
      * 00:28:18.865 [Test worker] INFO reactor.Flux.FilterFuseable.1 - | onNext(CHLOE)
      * 00:28:18.865 [Test worker] INFO reactor.Flux.FilterFuseable.1 - | onComplete()
+     * ------------------------------------------------------------------------------------------------------------
+     * This split the List.of(NAMES) filter the size name to print the names in onNext
+     * ------------------------------------------------------------------------------------------------------------
      */
     public Flux<String> namesFluxFilter(int nameFilter) {
         return Flux.fromIterable(NAMES)
@@ -95,6 +106,9 @@ public class FluxAndMonoGeneratorService {
      * 00:27:49.582 [Test worker] INFO reactor.Flux.FlatMap.1 - onNext(O)
      * 00:27:49.582 [Test worker] INFO reactor.Flux.FlatMap.1 - onNext(E)
      * 00:27:49.583 [Test worker] INFO reactor.Flux.FlatMap.1 - onComplete()
+     * ------------------------------------------------------------------------------------------------------------
+     * It's the fastest one since you are not preserving the order of non-blocking calls.
+     * ------------------------------------------------------------------------------------------------------------
      */
     public Flux<String> namesFluxFlatMap(int nameFilter) {
         return Flux.fromIterable(NAMES)
@@ -120,6 +134,7 @@ public class FluxAndMonoGeneratorService {
      * 00:27:20.364 [parallel-1] INFO reactor.Flux.FlatMap.1 - onComplete()
      * ------------------------------------------------------------------------------------------------------------
      * It's the fastest one since you are not preserving the order.
+     * The delay will simulate the time between the concurrency non-blocking calls.
      * ------------------------------------------------------------------------------------------------------------
      */
     public Flux<String> namesFluxFlatMapDelay(int nameFilter) {
@@ -168,6 +183,10 @@ public class FluxAndMonoGeneratorService {
      * 00:25:19.808 [Test worker] INFO reactor.Mono.FlatMap.1 - | request(unbounded)
      * 00:25:19.812 [Test worker] INFO reactor.Mono.FlatMap.1 - | onNext([A, L, E, X])
      * 00:25:19.816 [Test worker] INFO reactor.Mono.FlatMap.1 - | onComplete()
+     * ------------------------------------------------------------------------------------------------------------
+     * Create a List in a single result
+     * Mono -> flatMap -> Mono -> (input alex | output ([A, L, E, X])
+     * ------------------------------------------------------------------------------------------------------------
      */
     public Mono<List<String>> namesMonoFlatMapFilter(int stringLength) {
         return Mono.just("alex")
@@ -185,6 +204,9 @@ public class FluxAndMonoGeneratorService {
      * 00:26:11.380 [Test worker] INFO reactor.Flux.MonoFlatMapMany.1 - onNext(E)
      * 00:26:11.380 [Test worker] INFO reactor.Flux.MonoFlatMapMany.1 - onNext(X)
      * 00:26:11.381 [Test worker] INFO reactor.Flux.MonoFlatMapMany.1 - onComplete()
+     * ------------------------------------------------------------------------------------------------------------
+     * Mono -> flatMapMay -> Flux (input alex | output (A L E X)
+     * ------------------------------------------------------------------------------------------------------------
      */
     public Flux<String> namesMonoFlatMapMany(int stringLength) {
         return Mono.just("alex")
@@ -208,6 +230,11 @@ public class FluxAndMonoGeneratorService {
      * 00:59:48.128 [Test worker] INFO reactor.Flux.FlatMap.1 - onNext(O)
      * 00:59:48.128 [Test worker] INFO reactor.Flux.FlatMap.1 - onNext(E)
      * 00:59:48.129 [Test worker] INFO reactor.Flux.FlatMap.1 - onComplete()
+     * ------------------------------------------------------------------------------------------------------------
+     * Transform using Function UnaryOperator<T> implements Function<T,T>
+     * Flux -> flatMap -> FLux -> (input List.of(names) | output A L E X C H L O E
+     * In case
+     * ------------------------------------------------------------------------------------------------------------
      */
     public Flux<String> namesFluxTransform(int stringLength) {
         UnaryOperator<Flux<String>> filterMap =
@@ -219,7 +246,36 @@ public class FluxAndMonoGeneratorService {
                 //.map(String::toUpperCase)
                 //.filter(name -> name.length() > stringLength)
                 // FLUX (A, L, E, X)
-                .flatMap(name -> Flux.fromArray(name.split("")))
+                .defaultIfEmpty("default")
+                .log();
+    }
+
+    /**
+     * 01:32:18.937 [Test worker] INFO reactor.Flux.SwitchIfEmpty.1 - onSubscribe(FluxSwitchIfEmpty.SwitchIfEmptySubscriber)
+     * 01:32:18.944 [Test worker] INFO reactor.Flux.SwitchIfEmpty.1 - request(unbounded)
+     * 01:32:18.959 [Test worker] INFO reactor.Flux.SwitchIfEmpty.1 - onNext(D)
+     * 01:32:18.959 [Test worker] INFO reactor.Flux.SwitchIfEmpty.1 - onNext(E)
+     * 01:32:18.959 [Test worker] INFO reactor.Flux.SwitchIfEmpty.1 - onNext(F)
+     * 01:32:18.960 [Test worker] INFO reactor.Flux.SwitchIfEmpty.1 - onNext(A)
+     * 01:32:18.960 [Test worker] INFO reactor.Flux.SwitchIfEmpty.1 - onNext(U)
+     * 01:32:18.960 [Test worker] INFO reactor.Flux.SwitchIfEmpty.1 - onNext(L)
+     * 01:32:18.960 [Test worker] INFO reactor.Flux.SwitchIfEmpty.1 - onNext(T)
+     * 01:32:18.961 [Test worker] INFO reactor.Flux.SwitchIfEmpty.1 - onComplete()
+     */
+    public Flux<String> namesFluxTransformSwitchIfEmpty(int stringLength) {
+        UnaryOperator<Flux<String>> filterMap =
+                name -> name.map(String::toUpperCase) // default to DEFAULT
+                        // filter List.of(NAMES) there is any with length is greater than the param
+                        .filter(s -> s.length() > stringLength)
+                        // split D E F A U L T put in a flux array
+                        .flatMap(s -> Flux.fromArray(s.split("")));
+
+        // D, E, F, A, U, L, T
+        var defaultFlux = Flux.just("default").transform(filterMap);
+
+        return Flux.fromIterable(NAMES)
+                .transform(filterMap) // reuse the function unary created.
+                .switchIfEmpty(defaultFlux) // if empty return the defaultFlux
                 .log();
     }
 

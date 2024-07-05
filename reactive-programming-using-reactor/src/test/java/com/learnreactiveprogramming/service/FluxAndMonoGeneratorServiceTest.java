@@ -136,9 +136,37 @@ class FluxAndMonoGeneratorServiceTest {
         //when
         var namesFlux = service.namesFluxTransform(3);
 
-        //then - The only way you can see the changes is by chaining the function together or the operators together to get the desired result.
+        //then
         StepVerifier.create(namesFlux)
                 .expectNext("A", "L", "E", "X", "C", "H", "L", "O", "E")
+                .verifyComplete();
+    }
+
+    @Test
+    void namesFluxTransform1() {
+        //given
+
+        //when
+        var namesFlux = service.namesFluxTransform(6);
+
+        //then
+        StepVerifier.create(namesFlux)
+                .expectNext("default")
+                .verifyComplete();
+    }
+
+
+
+    @Test
+    void namesFluxTransformSwitchIfEmpty() {
+        //given
+
+        //when
+        var namesFlux = service.namesFluxTransformSwitchIfEmpty(6);
+
+        //then
+        StepVerifier.create(namesFlux)
+                .expectNext("D", "E", "F", "A", "U", "L", "T")
                 .verifyComplete();
     }
 }
