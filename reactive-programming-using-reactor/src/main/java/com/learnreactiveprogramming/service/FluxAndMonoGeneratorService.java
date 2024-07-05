@@ -3,6 +3,7 @@ package com.learnreactiveprogramming.service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
@@ -297,6 +298,11 @@ public class FluxAndMonoGeneratorService {
         return Flux.concat(abcFlux, defFlux).log();
     }
 
+    /**
+     * concatenation of reactive streams happens in a sequence
+     * first one is subscribed first and completes
+     * second one is subscribed after that and completes
+     */
     public Flux<String> exploreConcatWith() {
         final var aFlux = Mono.just("A");
         final var bFlux = Mono.just("B");
@@ -305,6 +311,37 @@ public class FluxAndMonoGeneratorService {
         return aFlux.concatWith(
                 bFlux.concatWith(cdfFlux))
                 .log();
+    }
+
+    /**
+     * 02:03:26.139 [Test worker] INFO reactor.Flux.ConcatArray.1 - onSubscribe(FluxConcatArray.ConcatArraySubscriber)
+     * 02:03:26.147 [Test worker] INFO reactor.Flux.ConcatArray.1 - request(unbounded)
+     * 02:03:26.316 [parallel-1] INFO reactor.Flux.ConcatArray.1 - onNext(A)
+     * 02:03:26.419 [parallel-2] INFO reactor.Flux.ConcatArray.1 - onNext(B)
+     * 02:03:26.520 [parallel-3] INFO reactor.Flux.ConcatArray.1 - onNext(C)
+     * 02:03:26.550 [parallel-4] INFO reactor.Flux.ConcatArray.1 - onNext(D)
+     * 02:03:26.581 [parallel-1] INFO reactor.Flux.ConcatArray.1 - onNext(E)
+     * 02:03:26.614 [parallel-2] INFO reactor.Flux.ConcatArray.1 - onNext(F)
+     * 02:03:26.615 [parallel-2] INFO reactor.Flux.ConcatArray.1 - onComplete()
+     * ------------------------------------------------------------------------------------------------------------
+     * The order of the leathers show this is concurrent process
+     * ------------------------------------------------------------------------------------------------------------
+     */
+    public Flux<String> exploreMerge() {
+        final var abcFlux = Flux.just("A", "B", "C")
+                .delayElements(Duration.ofMillis(100)); //
+        final var defFlux = Flux.just("D", "E", "F")
+                .delayElements(Duration.ofMillis(25)); //
+
+        return Flux.concat(abcFlux, defFlux).log();
+    }
+
+    public Flux<String> exploreMergeWith() {
+        final var aFlux = Flux.just("X", "W", "X", "Z", "A");
+        final var bFlux = Mono.just("B");
+        final var cdfFlux = Flux.just("C", "A", "E", "F");
+
+        return aFlux.mergeWith(bFlux.mergeWith(cdfFlux)).log();
     }
 
     public static void main(String[] args) {
