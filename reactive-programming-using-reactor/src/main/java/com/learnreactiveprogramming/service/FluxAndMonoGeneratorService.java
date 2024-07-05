@@ -279,6 +279,34 @@ public class FluxAndMonoGeneratorService {
                 .log();
     }
 
+    /**
+     * 01:48:37.168 [Test worker] INFO reactor.Flux.ConcatArray.1 - onSubscribe(FluxConcatArray.ConcatArraySubscriber)
+     * 01:48:37.179 [Test worker] INFO reactor.Flux.ConcatArray.1 - request(unbounded)
+     * 01:48:37.183 [Test worker] INFO reactor.Flux.ConcatArray.1 - onNext(A)
+     * 01:48:37.184 [Test worker] INFO reactor.Flux.ConcatArray.1 - onNext(B)
+     * 01:48:37.185 [Test worker] INFO reactor.Flux.ConcatArray.1 - onNext(C)
+     * 01:48:37.185 [Test worker] INFO reactor.Flux.ConcatArray.1 - onNext(D)
+     * 01:48:37.186 [Test worker] INFO reactor.Flux.ConcatArray.1 - onNext(E)
+     * 01:48:37.186 [Test worker] INFO reactor.Flux.ConcatArray.1 - onNext(F)
+     * 01:48:37.188 [Test worker] INFO reactor.Flux.ConcatArray.1 - onComplete()
+     */
+    public Flux<String> exploreConcat() {
+        final var abcFlux = Flux.just("A", "B", "C");
+        final var defFlux = Flux.just("D", "E", "F");
+
+        return Flux.concat(abcFlux, defFlux).log();
+    }
+
+    public Flux<String> exploreConcatWith() {
+        final var aFlux = Mono.just("A");
+        final var bFlux = Mono.just("B");
+        final var cdfFlux = Flux.just("C", "D", "E", "F");
+
+        return aFlux.concatWith(
+                bFlux.concatWith(cdfFlux))
+                .log();
+    }
+
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
 
