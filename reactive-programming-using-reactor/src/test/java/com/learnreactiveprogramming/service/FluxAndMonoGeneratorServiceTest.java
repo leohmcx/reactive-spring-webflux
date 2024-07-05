@@ -221,4 +221,17 @@ class FluxAndMonoGeneratorServiceTest {
                 .expectNextCount(10)
                 .verifyComplete();
     }
+
+    @Test
+    void exploreMergeSeq() {
+        //given
+
+        //when
+        var concatFlux = service.exploreMergeSeq();
+
+        //then
+        StepVerifier.create(concatFlux)
+                .expectNext("A", "B", "C", "D", "E", "F")
+                .verifyComplete();
+    }
 }

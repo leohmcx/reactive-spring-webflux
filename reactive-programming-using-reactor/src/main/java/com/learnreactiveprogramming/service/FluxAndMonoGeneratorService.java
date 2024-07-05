@@ -333,7 +333,7 @@ public class FluxAndMonoGeneratorService {
         final var defFlux = Flux.just("D", "E", "F")
                 .delayElements(Duration.ofMillis(25)); //
 
-        return Flux.concat(abcFlux, defFlux).log();
+        return Flux.merge(abcFlux, defFlux).log();
     }
 
     public Flux<String> exploreMergeWith() {
@@ -342,6 +342,29 @@ public class FluxAndMonoGeneratorService {
         final var cdfFlux = Flux.just("C", "A", "E", "F");
 
         return aFlux.mergeWith(bFlux.mergeWith(cdfFlux)).log();
+    }
+
+    /**
+     * 02:15:20.208 [Test worker] INFO reactor.Flux.MergeSequential.1 - onSubscribe(FluxMergeSequential.MergeSequentialMain)
+     * 02:15:20.213 [Test worker] INFO reactor.Flux.MergeSequential.1 - request(unbounded)
+     * 02:15:20.368 [parallel-1] INFO reactor.Flux.MergeSequential.1 - onNext(A)
+     * 02:15:20.474 [parallel-1] INFO reactor.Flux.MergeSequential.1 - onNext(B)
+     * 02:15:20.580 [parallel-2] INFO reactor.Flux.MergeSequential.1 - onNext(C)
+     * 02:15:20.580 [parallel-2] INFO reactor.Flux.MergeSequential.1 - onNext(D)
+     * 02:15:20.581 [parallel-2] INFO reactor.Flux.MergeSequential.1 - onNext(E)
+     * 02:15:20.581 [parallel-2] INFO reactor.Flux.MergeSequential.1 - onNext(F)
+     * 02:15:20.582 [parallel-2] INFO reactor.Flux.MergeSequential.1 - onComplete()
+     * ------------------------------------------------------------------------------------------------------------
+     * The Flux execute at the same time but merge in a sequence so the order is keep.
+     * ------------------------------------------------------------------------------------------------------------
+     */
+    public Flux<String> exploreMergeSeq() {
+        final var abcFlux = Flux.just("A", "B", "C")
+                .delayElements(Duration.ofMillis(100)); //
+        final var defFlux = Flux.just("D", "E", "F")
+                .delayElements(Duration.ofMillis(25)); //
+
+        return Flux.mergeSequential(abcFlux, defFlux).log();
     }
 
     public static void main(String[] args) {
