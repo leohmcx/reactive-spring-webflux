@@ -234,4 +234,56 @@ class FluxAndMonoGeneratorServiceTest {
                 .expectNext("A", "B", "C", "D", "E", "F")
                 .verifyComplete();
     }
+
+    @Test
+    void exploreZip() {
+        //given
+
+        //when
+        var concatFlux = service.exploreZip();
+
+        //then
+        StepVerifier.create(concatFlux)
+                .expectNext("AD", "BE", "CF")
+                .verifyComplete();
+    }
+
+    @Test
+    void exploreZip1() {
+        //given
+
+        //when
+        var concatFlux = service.exploreZip1();
+
+        //then
+        StepVerifier.create(concatFlux)
+                .expectNext("AD14", "BE25", "CF36")
+                .verifyComplete();
+    }
+
+    @Test
+    void exploreZipWithFlux() {
+        //given
+
+        //when
+        var concatFlux = service.exploreZipWithFlux();
+
+        //then
+        StepVerifier.create(concatFlux)
+                .expectNext("AD", "BE", "CF")
+                .verifyComplete();
+    }
+
+    @Test
+    void exploreZipWithMono() {
+        //given
+
+        //when
+        var concatFlux = service.exploreZipWithMono();
+
+        //then
+        StepVerifier.create(concatFlux)
+                .expectNext("AD")
+                .verifyComplete();
+    }
 }

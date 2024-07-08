@@ -367,6 +367,71 @@ public class FluxAndMonoGeneratorService {
         return Flux.mergeSequential(abcFlux, defFlux).log();
     }
 
+    /**
+     * 23:18:20.316 [Test worker] INFO reactor.Flux.Map.1 - onSubscribe(FluxMap.MapSubscriber)
+     * 23:18:20.360 [Test worker] INFO reactor.Flux.Map.1 - request(unbounded)
+     * 23:18:20.404 [Test worker] INFO reactor.Flux.Map.1 - onNext(AD)
+     * 23:18:20.406 [Test worker] INFO reactor.Flux.Map.1 - onNext(BE)
+     * 23:18:20.407 [Test worker] INFO reactor.Flux.Map.1 - onNext(CF)
+     * 23:18:20.417 [Test worker] INFO reactor.Flux.Map.1 - onComplete()
+     */
+    public Flux<String> exploreZip() {
+        final var abcFlux = Flux.just("A", "B", "C");
+        final var defFlux = Flux.just("D", "E", "F");
+
+        return Flux.zip(abcFlux, defFlux).map(a -> a.getT1() + a.getT2()).log();
+    }
+
+    /**
+     * 23:22:55.625 [Test worker] INFO reactor.Flux.Map.1 - onSubscribe(FluxMap.MapSubscriber)
+     * 23:22:55.644 [Test worker] INFO reactor.Flux.Map.1 - request(unbounded)
+     * 23:22:55.712 [Test worker] INFO reactor.Flux.Map.1 - onNext(AD14)
+     * 23:22:55.712 [Test worker] INFO reactor.Flux.Map.1 - onNext(BE25)
+     * 23:22:55.713 [Test worker] INFO reactor.Flux.Map.1 - onNext(CF36)
+     * 23:22:55.714 [Test worker] INFO reactor.Flux.Map.1 - onComplete()
+     */
+    public Flux<String> exploreZip1() {
+        final var abcFlux = Flux.just("A", "B", "C");
+        final var defFlux = Flux.just("D", "E", "F");
+        final var flux123 = Flux.just("1", "2", "3");
+        final var flux456 = Flux.just("4", "5", "6");
+
+        return Flux.zip(abcFlux, defFlux, flux123, flux456)
+                .map(a -> a.getT1() + a.getT2() + a.getT3() + a.getT4())
+                .log();
+    }
+
+    /**
+     * 23:28:55.044 [Test worker] INFO reactor.Flux.Zip.1 - onSubscribe(FluxZip.ZipCoordinator)
+     * 23:28:55.055 [Test worker] INFO reactor.Flux.Zip.1 - request(unbounded)
+     * 23:28:55.087 [Test worker] INFO reactor.Flux.Zip.1 - onNext(AD)
+     * 23:28:55.087 [Test worker] INFO reactor.Flux.Zip.1 - onNext(BE)
+     * 23:28:55.088 [Test worker] INFO reactor.Flux.Zip.1 - onNext(CF)
+     * 23:28:55.090 [Test worker] INFO reactor.Flux.Zip.1 - onComplete()
+     */
+    public Flux<String> exploreZipWithFlux() {
+        final var abcFlux = Flux.just("A", "B", "C");
+        final var defFlux = Flux.just("D", "E", "F");
+
+        return abcFlux.zipWith(defFlux, (first, second) -> first + second)
+                .log();
+    }
+
+    /**
+     * 23:29:22.598 [Test worker] INFO reactor.Mono.Map.1 - onSubscribe(FluxMap.MapSubscriber)
+     * 23:29:22.606 [Test worker] INFO reactor.Mono.Map.1 - request(unbounded)
+     * 23:29:22.631 [Test worker] INFO reactor.Mono.Map.1 - onNext(AD)
+     * 23:29:22.633 [Test worker] INFO reactor.Mono.Map.1 - onComplete()
+     */
+    public Mono<String> exploreZipWithMono() {
+        final var abcFlux = Mono.just("A");
+        final var defFlux = Mono.just("D");
+
+        return abcFlux.zipWith(defFlux)
+                .map(a -> a.getT1() + a.getT2())
+                .log();
+    }
+
     public static void main(String[] args) {
         FluxAndMonoGeneratorService fluxAndMonoGeneratorService = new FluxAndMonoGeneratorService();
 
