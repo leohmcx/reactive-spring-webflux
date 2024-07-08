@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
+import static java.time.Duration.ofSeconds;
 
 @RestController
 public class FluxAndMonoController {
@@ -23,6 +23,6 @@ public class FluxAndMonoController {
 
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Long> stream() {
-        return Flux.interval(Duration.ofSeconds(1)).log();
+        return Flux.interval(ofSeconds(1)).log();
     }
 }
